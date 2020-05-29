@@ -1,4 +1,1 @@
-fdfsf tttttttttttttdfs fsdfsf kljsljfljsflalf
-Khjhkhkh
-Kljljljlj
-Kjljljlj
+<?php echo "hello"; ?>
