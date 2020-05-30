@@ -176,64 +176,44 @@ class Authanticate extends CI_Controller {
 	}
 	
 	function passupdate(){
-  
-
-		$guid     = $this->input->post('id');
-		$password = $this->input->post('password');
-    
-    $q1 = $this->db->query("select user_id from apikeys where keyval='{$guid}' and date_created >= now() - INTERVAL 1 DAY ");
-    if($q1->num_rows>0)
-		{
-      	$rdata = $q1->result();
-        $id =  $rdata[0]->user_id;
-        
-        
-        $sql = "DELETE from `apikeys` where `user_id`='{$id}'";
-         
-        //Delete apikey
-    		$this->db->query($sql = "DELETE from `apikeys` where `user_id`='{$id}'");
-    		
-      
-        
-    		$q = $this->db->query("select * from user where id='".$id."' ");
-        if($q->num_rows>0)
-    		{
-    			$r = $q->result();
-    			$email=$r[0]->email;
-    			$this->db->where('id', $id);
-    			$this->db->update('user',array('password'=>MD5($password)));
-    		
-          
-    			$this->load->helper('url');
-    			$burl=base_url();
-    			$baseurl=$burl;
-    
-    			$this->load->library('email');
-    			$this->email->set_mailtype("html");
-    			$this->email->from('no-reply@hallenconstruction.com', 'Hallen Construction');
-    			$this->email->to($email);
-    			$this->email->subject('(PLEASE IGNORE - FOR TESTING PURPOSES ONLY) Your new password reset successfully');
-    			$body='Your password successfully reset, You should login now with new password: <a href="'.$baseurl.'">Login</a>.';
-    			$this->email->message($body);
-    			$this->email->send();
-    			
-    			$data = "Password successfullt reset please login with new password";
-    			header("HTTP/1.1 200 OK");
-    			echo json_encode(array('status' => $data));
-    			return;
-            }
-    			header("HTTP/1.1 200 OK");
-    			echo json_encode(array('error' => 'duplicate'));
-    			return;
-    		//header("HTTP/1.1 200 OK");
-    		//echo json_encode(array('error' => 'notmatched'));
-    		//return;
-    
-    }
-    
-   
+		$id= $_POST['id'];
+		$password=stripslashes($_POST['password']);
 		
-	
+		//Delete apikey
+		$this->db->query("DELETE from `apikeys` where `user_id`='{$id}'");
+		
+		$q = $this->db->query("select * from user where id='".$id."' ");
+        if($q->num_rows>0)
+		{
+			$r = $q->result();
+			$email=$r[0]->email;
+			$this->db->where('id', $id);
+			$this->db->update('user',array('password'=>MD5($password)));
+			
+			$this->load->helper('url');
+			$burl=base_url();
+			$baseurl=$burl;
+
+			$this->load->library('email');
+			$this->email->set_mailtype("html");
+			$this->email->from('no-reply@hallenconstruction.com', 'Hallen Construction');
+			$this->email->to($email);
+			$this->email->subject('(PLEASE IGNORE - FOR TESTING PURPOSES ONLY) Your new password reset successfully');
+			$body='Your password successfully reset, You should login now with new password: <a href="'.$baseurl.'">Login</a>.';
+			$this->email->message($body);
+			$this->email->send();
+			
+			$data = "Password successfullt reset please login with new password";
+			header("HTTP/1.1 200 OK");
+			echo json_encode(array('status' => $data));
+			return;
+        }
+			header("HTTP/1.1 200 OK");
+			echo json_encode(array('error' => 'duplicate'));
+			return;
+		//header("HTTP/1.1 200 OK");
+		//echo json_encode(array('error' => 'notmatched'));
+		//return;
 	}
 	
 	function resetpass(){
@@ -307,9 +287,8 @@ class Authanticate extends CI_Controller {
 	}
 	
 	private function resetpassword($apikey,$email)
-	{       
-  
-  
+	{
+		
 		$this->load->helper('string');
 		//$password= random_string('alnum', 16);
 		//$this->db->where('id', $user->id);
@@ -329,8 +308,6 @@ class Authanticate extends CI_Controller {
 		$body='Please <a href="'.$baseurl.'">click here</a> to reset your password. <br /><br /> You should reset new password within 24 hours using this link otherwise you need to again reset that.';
 		$this->email->message($body);
 		$this->email->send();
-    
-
 	}
 	
 	function signup(){
